@@ -44,6 +44,7 @@ public class Karloff implements KarloffConstants {
       case MAIOR:
       case IGUAL:
       case VIRGULA:
+      case FUNC:
       case NUM:
       case ID:{
         ;
@@ -146,7 +147,7 @@ System.out.println("Palavra reservada: System.output");
         }
       case SREADINT:{
         jj_consume_token(SREADINT);
-System.out.println("Palavra reservada: System.readint}");
+System.out.println("Palavra reservada: System.readint");
         break;
         }
       case TRUE:{
@@ -209,6 +210,11 @@ System.out.println("Operador L\u00f3gico: ==");
 System.out.println("Palavra reservada: ,");
         break;
         }
+      case FUNC:{
+        jj_consume_token(FUNC);
+System.out.println("Declara\u00e7\u00e3o de fun\u00e7\u00e3o: func");
+        break;
+        }
       case NUM:{
         t = jj_consume_token(NUM);
 System.out.println("N\u00famero: "+ t.image);
@@ -249,7 +255,7 @@ System.out.println("Identificador: "+ t.image);
 	   jj_la1_0 = new int[] {0xffffffe0,0xffffffe0,};
 	}
 	private static void jj_la1_init_1() {
-	   jj_la1_1 = new int[] {0x3f,0x3f,};
+	   jj_la1_1 = new int[] {0x7f,0x7f,};
 	}
 
   /** Constructor with InputStream. */
@@ -395,7 +401,7 @@ System.out.println("Identificador: "+ t.image);
   /** Generate ParseException. */
   static public ParseException generateParseException() {
 	 jj_expentries.clear();
-	 boolean[] la1tokens = new boolean[38];
+	 boolean[] la1tokens = new boolean[39];
 	 if (jj_kind >= 0) {
 	   la1tokens[jj_kind] = true;
 	   jj_kind = -1;
@@ -412,7 +418,7 @@ System.out.println("Identificador: "+ t.image);
 		 }
 	   }
 	 }
-	 for (int i = 0; i < 38; i++) {
+	 for (int i = 0; i < 39; i++) {
 	   if (la1tokens[i]) {
 		 jj_expentry = new int[1];
 		 jj_expentry[0] = i;

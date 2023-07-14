@@ -1,0 +1,29 @@
+void main () {
+    newVar integer termo1;
+    newVar integer termo 2;
+    termo1 = System.readint ();
+    termo2 = System.readint ();
+
+    newVar bool isTermo1EqualToTermo2;
+    isTermo1EqualToTermo2 = termo1 == termo2;
+
+    if (termo2 > termo1) then {
+        while (termo2 > termo1) {
+            termo2 = termo2 - 1;
+            isTermo1EqualToTermo2 = termo1 == termo2;
+        };
+    };
+    if (termo2 < termo1) {
+        while (termo2 < termo1) {
+            termo2 = termo2 - 1;
+            isTermo1EqualToTermo2 = termo1 == termo2;
+        };
+    };
+    printIsEqual(isTermo1EqualToTermo2);
+}
+
+func bool printIsEqual(bool teste) {
+    if (teste) then {
+        System.output (Sao iguais);
+    };
+}

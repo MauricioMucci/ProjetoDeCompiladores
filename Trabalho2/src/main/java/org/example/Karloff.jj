@@ -81,14 +81,14 @@ void Karloff () :
 | <INTEIRO> { System.out.println("Tipo: integer");}
 | <BOOLEANO> { System.out.println("Tipo: bool");}
 | <ATRIB> { System.out.println("Atribuição: =");}
-| <IF> { System.out.println("Condicional: if}");}
+| <IF> { System.out.println("Condicional: if");}
 | <THEN> { System.out.println("Condicional: then");}
 | <WHILE> { System.out.println("Loop: while");}
 | <REPEAT> { System.out.println("Loop: repeat");}
 | <UNTIL> { System.out.println("Loop: until");}
 | <RETURN> { System.out.println("Palavra reservada: return");}
 | <SOUT> { System.out.println("Palavra reservada: System.output");}
-| <SREADINT> { System.out.println("Palavra reservada: System.readint}");}
+| <SREADINT> { System.out.println("Palavra reservada: System.readint");}
 | <TRUE> { System.out.println("Palavra reservada: true");}
 | <FALSE> { System.out.println("Palavra reservada: false");}
 | <SOMA> { System.out.println("Operador Aritmético: +");}
@@ -101,7 +101,7 @@ void Karloff () :
 | <MAIOR> { System.out.println("Operador Lógico: >");}
 | <IGUAL> { System.out.println("Operador Lógico: ==");}
 | <VIRGULA> { System.out.println("Palavra reservada: ,");}
-| <FUNC> { System.out.println("Palavra reservada: func");}
+| <FUNC> { System.out.println("Declaração de função: func");}
 | t=<NUM> { System.out.println("Número: "+ t.image);}
 | t=<ID> { System.out.println("Identificador: "+ t.image);}
 )*
