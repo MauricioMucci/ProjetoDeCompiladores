@@ -1,6 +1,6 @@
 void main () {
     newVar integer numTermos;
-    numTermos = System.readint ();
+    numTermos = System.readint();
 
     newVar integer resultado;
     resultado = fibonnaci(numTermos);
@@ -10,6 +10,6 @@ func integer fibonnaci (integer seq) {
     if (seq < 2) then {
         return seq;
     };
-    System.output (seq);
-    return fibonnaci (seq - 1) + fibonnaci (n - 2);
+    System.output(seq);
+    return (fibonnaci(seq - 1) + fibonnaci(n - 2));
 }

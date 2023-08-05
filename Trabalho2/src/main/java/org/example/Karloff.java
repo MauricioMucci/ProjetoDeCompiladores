@@ -112,7 +112,7 @@ System.out.println("Atribui\u00e7\u00e3o: =");
         }
       case IF:{
         jj_consume_token(IF);
-System.out.println("Condicional: if}");
+System.out.println("Condicional: if");
         break;
         }
       case THEN:{
