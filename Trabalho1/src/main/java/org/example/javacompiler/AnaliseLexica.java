@@ -59,7 +59,7 @@ class AnaliseLexica {
 					nextChar = (char) arquivo.read();
 					
 					while (nextChar >= '0' && nextChar <= '9') {
-						nDigitos.append(currchar);
+						nDigitos.append(nextChar);
 						arquivo.mark(10);
 						nextChar = (char) arquivo.read();
 					}
