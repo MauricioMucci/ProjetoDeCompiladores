@@ -27,7 +27,8 @@ public class MaquinaPilha {
                     pilha.push(resultado);
                 }
                 if (str.contains("SUB")){
-                    resultado = pilha.pop().subtract(pilha.pop());
+                    BigDecimal pop = pilha.pop();
+                    resultado = pilha.pop().subtract(pop);
                     pilha.push(resultado);
                 }
                 if (str.contains("MULT")){
@@ -35,7 +36,8 @@ public class MaquinaPilha {
                     pilha.push(resultado);
                 }
                 if (str.contains("DIV")){
-                    resultado = pilha.pop().divide(pilha.pop(), new MathContext(4));
+                    BigDecimal pop = pilha.pop();
+                    resultado = pilha.pop().divide(pop, new MathContext(4));
                     pilha.push(resultado);
                 }
                 if (str.contains("PRINT"))
