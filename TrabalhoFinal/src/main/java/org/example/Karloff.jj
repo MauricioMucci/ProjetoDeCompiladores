@@ -1,0 +1,331 @@
+PARSER_BEGIN(Karloff)
+import com.sun.tools.javac.Main;import java.io.*;
+import java.util.ArrayList;
+
+class KarloffTree{
+    Principal main;
+    ArrayList<Funcao> funcoes;
+
+    KarloffTree(Principal main, ArrayList<Funcao> funcoes){
+        this.main = main;
+        this.funcoes = funcoes;
+    }
+}
+
+class Principal{
+    DeclaracaoVar declaracaoVar;
+    SequenciaDeComandos sequenciaDeComandos;
+
+    Main(DeclaracaoVar declaracaoVar, SequenciaDeComandos sequenciaDeComandos){
+        this.declaracaoVar = declaracaoVar;
+        this.sequenciaDeComandos = sequenciaDeComandos;
+    }
+}
+
+class DeclaracaoVar{
+    TipoDeVar tipoDeVar;
+    TokenId tokenId;
+
+    DeclaracaoVar(TipoDeVar tipoDeVar, TokenId tokenId){
+        this.tipoDeVar = tipoDeVar;
+        this.tokenId = tokenId;
+    }
+}
+
+class TipoDeVar{
+    String tipoDeVar;
+
+    TipoDeVar(String tipoDeVar){
+        this.tipoDeVar = tipoDeVar;
+    }
+}
+
+class SequenciaDeComandos{
+    ArrayList<Com> comando;
+
+    SequenciaDeComandos(ArrayList<Com> comando){
+        this.comando = comando;
+    }
+}
+
+class Com{}
+class Atribuicao extends Com{
+    Exp exp;
+    TokenId tokenId;
+
+    Atribuicao(Exp exp, TokenId tokenId){
+        this.exp = exp;
+        this.tokenId = tokenId;
+    }
+}
+class ChamadaFunc extends Com{
+    TokenId tokenId;
+    ListaExp listaExp;
+
+    ChamadaFunc(TokenId tokenId, ListaExp listaExp){
+        this.tokenId = tokenId;
+        this.listaExp = listaExp;
+    }
+}
+class Condicional extends Com{
+    Exp exp;
+    SequenciaDeComandos sequenciaDeComandos;
+
+    Condicional(Exp exp, SequenciaDeComandos sequenciaDeComandos){
+        this.exp = exp;
+        this.sequenciaDeComandos = sequenciaDeComandos;
+    }
+}
+class LacoWhile extends Com{
+    Exp exp;
+    SequenciaDeComandos sequenciaDeComandos;
+
+    LacoWhile(Exp exp, SequenciaDeComandos sequenciaDeComandos){
+        this.exp = exp;
+        this.sequenciaDeComandos = sequenciaDeComandos;
+    }
+}
+class LacoRepeat extends Com{
+    Exp exp;
+    SequenciaDeComandos sequenciaDeComandos;
+
+    LacoRepeat(Exp exp, SequenciaDeComandos sequenciaDeComandos){
+        this.exp = exp;
+        this.sequenciaDeComandos = sequenciaDeComandos;
+    }
+}
+class Retorno extends Com{
+    Exp exp;
+
+    Retorno(Exp exp){
+        this.exp = exp;
+    }
+}
+class Saida extends Com{
+    Exp exp;
+
+    Saida(Exp exp){
+        this.exp = exp;
+    }
+}
+class Scan extends Com{
+    TokenId tokenId;
+
+    Scan(TokenId tokenId){
+        this.tokenId = tokenId;
+    }
+}
+
+class TokenId {
+    String var;
+
+    TokenId(String var){
+        this.var = var;
+    }
+}
+
+class TokenNum {
+    Integer num;
+
+    TokenNum(Integer num){
+        this.num = num;
+    }
+}
+
+
+public class Karloff {
+    public static void main(String[] args) throws IOException {
+
+        Karloff parser = new Karloff(new FileInputStream(args[0]));
+        KarloffTree tree = parser.Karloff();
+        System.out.println(tree);
+
+    }
+}
+
+PARSER_END(Karloff)
+
+SKIP :
+{
+  " "
+| "\t"
+| "\n"
+| "\r"
+}
+
+TOKEN :
+{
+  <MAIN: "main">
+| <ACHAVES: "{">
+| <FCHAVES: "}">
+| <VOID: "void">
+| <APARENTESES: "(">
+| <FPARENTESES: ")">
+| <NEWVAR: "newVar">
+| <PONTOVIRGULA: ";">
+| <INTEIRO: "integer">
+| <BOOLEANO: "bool">
+| <ATRIB: "=">
+| <IF: "if">
+| <THEN: "then">
+| <WHILE: "while">
+| <REPEAT: "repeat">
+| <UNTIL: "until">
+| <RETURN: "return">
+| <SOUT: "System.output">
+| <SREADINT: "System.readint">
+| <TRUE: "true">
+| <FALSE: "false">
+| <SOMA: "+">
+| <SUB: "-">
+| <MULT: "*">
+| <DIV: "/">
+| <AND: "&">
+| <OR: "|">
+| <MENOR: "<">
+| <MAIOR: ">">
+| <IGUAL: "==">
+| <VIRGULA: ",">
+| <FUNC: "func">
+}
+
+TOKEN :
+{
+  <NUM : (["0"-"9"])+>
+ |< ID: ["a"-"z","A"-"Z"] ( ["a"-"z","A"-"Z","0"-"9"])*>
+
+}
+
+// KARLOFF → MAIN FUNC?
+KarloffTree Karloff () :
+{Principal main = null; Funcao funcao = null;}
+{
+    main=Main() (funcao=Func())?
+    <EOF>
+    {return new KarloffTree(main, funcao);}
+}
+
+// MAIN → "void" "main" "(" ")" "{" VARDECL SEQCOMANDOS "}"
+Principal Main () :
+{DeclaracaoVar varDec = null; SequenciaDeComandos seqCom = null;}
+{
+    <VOID> <MAIN> <APARENTESES> <FPARENTESES> <ACHAVES> varDec=Vardecl() seqCom=SeqComandos() <FCHAVES>
+    {return new Principal(varDec, seqCom);}
+}
+
+// VARDECL → VARDECL "newVar" TIPO TOKEN_id ";" | vazio
+DeclaracaoVar Vardecl () :
+{Token t = null; TipoDeVar tipoDeVar = null;}
+{
+    (<NEWVAR> tipoDeVar=Tipo() t=<ID> <PONTOVIRGULA>)*
+    {return new DeclaracaoVar(tipoDeVar, new TokenId(t.image));}
+}
+
+// TIPO → "integer" | "bool"
+TipoDeVar Tipo () :
+{TipoDeVar result = null;}
+{
+    (
+        <INTEIRO> {result = new TipoDeVar("integer");}
+        | <BOOLEANO> {result = new TipoDeVar("bool");}
+    )
+    {return result;}
+}
+
+// SEQCOMANDOS → SEQCOMANDOS COMANDO | vazio
+SequenciaDeComandos SeqComandos () :
+{Com c = null; ArrayList<Com> comandos = new ArrayList<>();}
+{
+    (c=Comando())* {comandos.add(c); return comandos;}
+}
+
+
+// COMANDO → TOKEN_id COMANDO’
+// | "if" "(" EXP ")" "then" "{" SEQCOMANDOS "}"  ";"
+// | "while" "(" EXP ")" "{" SEQCOMANDOS "}"  ";"
+// | "repeat" "{" SEQCOMANDOS "}" "until" "(" EXP ")"  ";"
+// | "return" EXP  ";"
+// | "System.output" "(" EXP ")"  ";"
+Com Comando () :
+{Token t = null; TokenId tokenId = null; SequenciaDeComandos seqCom = null;
+Expressao e = null; Com result = null; Com comL = null;}
+{
+    (
+        t=<ID> comL=Comando_()
+        | <IF> <APARENTESES> e=Exp() <FPARENTESES> <THEN> <ACHAVES> seqCom=SeqComandos() <FCHAVES> <PONTOVIRGULA> {result = new Condicional(e, seqCom);}
+        | <WHILE> <APARENTESES> e=Exp() <FPARENTESES> <ACHAVES> seqCom=SeqComandos() <FCHAVES> <PONTOVIRGULA> {result = new LacoWhile(e, seqCom);}
+        | <REPEAT> <ACHAVES> seqCom=SeqComandos() <FCHAVES> <UNTIL> <APARENTESES> e=Exp() <FPARENTESES> <PONTOVIRGULA> {result = new LacoRepeat(e, seqCom);}
+        | <RETURN> e=Exp() <PONTOVIRGULA> {result = new Retorno(e);}
+        | <SOUT> <APARENTESES> e=Exp() <FPARENTESES> <PONTOVIRGULA> {result = new Saida(e);}
+    )
+
+    {return result;}
+}
+
+// COMANDO’ → "=" COMANDO’’ | "(" LISTAEXP? ")"  ";"
+void Comando_ () :
+{}
+{
+(<ATRIB> Comando__())
+| (<APARENTESES> (ListaExp())? <FPARENTESES> <PONTOVIRGULA>)
+}
+
+// COMANDO’’ → EXP ";" | "System.readint" "(" ")" ";"
+void Comando__ () :
+{}
+{
+(Exp() <PONTOVIRGULA>)
+| (<SREADINT> <APARENTESES> <FPARENTESES> <PONTOVIRGULA>)
+}
+
+//EXP →  "(" EXP OP EXP ")" | FATOR
+void Exp () :
+{}
+{
+(<APARENTESES> Exp() Op() Exp() <FPARENTESES>)
+| Fator()
+}
+
+//FATOR →  TOKEN_id FATOR’| TOKEN_numliteral | "true" | "false"
+void Fator () :
+{}
+{
+(<ID> Fator_()) | <NUM> | <TRUE> | <FALSE>
+}
+
+//FATOR’ →  "(" LISTAEXP? ")" | vazio
+void Fator_ () :
+{}
+{
+(<APARENTESES> (ListaExp())? <FPARENTESES>)?
+}
+
+//OP →  "+" | "-" | "*" | "/" | "&" | "|" | "<" | ">" | "=="
+void Op () :
+{}
+{
+<SOMA> | <SUB> | <MULT> | <DIV> | <AND> | <OR> | <MENOR> | <MAIOR> | <IGUAL>
+}
+
+//LISTAEXP → EXP | LISTAEXP "," EXP
+void ListaExp () :
+{}
+{
+Exp() (<VIRGULA> Exp())*
+}
+
+//FUNC → FUNC "func" TIPO TOKEN_id "(" LISTAARG? ")" "{" VARDECL SEQCOMANDOS "}"
+//        | "func" TIPO TOKEN_id "(" LISTAARG? ")" "{" VARDECL SEQCOMANDOS "}"
+void Func () :
+{}
+{
+(<FUNC> Tipo() <ID> <APARENTESES> (ListaArg())? <FPARENTESES> <ACHAVES> Vardecl() SeqComandos() <FCHAVES>)+
+}
+
+
+//LISTAARG → TIPO TOKEN_id | LISTAARG "," TIPO TOKEN_id
+void ListaArg () :
+{Token t; TipoDeVar tipoDeVar;}
+{
+Tipo() <ID> (<VIRGULA> Tipo() <ID>)*
+}
