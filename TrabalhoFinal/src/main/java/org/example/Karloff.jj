@@ -1,5 +1,5 @@
 PARSER_BEGIN(Karloff)
-import com.sun.tools.javac.Main;import java.io.*;
+import java.io.*;
 import java.util.ArrayList;
 
 class KarloffTree{
@@ -10,25 +10,48 @@ class KarloffTree{
         this.main = main;
         this.funcoes = funcoes;
     }
+
+    @Override
+    public String toString() {
+        return super.toString();
+    }
 }
 
 class Principal{
-    DeclaracaoVar declaracaoVar;
+    ArrayList<DeclaracaoVar> declaracaoVar;
     SequenciaDeComandos sequenciaDeComandos;
 
-    Main(DeclaracaoVar declaracaoVar, SequenciaDeComandos sequenciaDeComandos){
+    Main(SequenciaDeComandos sequenciaDeComandos, ArrayList<DeclaracaoVar> declaracaoVar){
         this.declaracaoVar = declaracaoVar;
         this.sequenciaDeComandos = sequenciaDeComandos;
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append("void main() {\n");
+        for (DeclaracaoVar decVar : this.declaracaoVar) {
+            stringBuilder.append(decVar).append("\n");
+        }
+        return stringBuilder.append(this.sequenciaDeComandos).append("}\n").toString();
     }
 }
 
 class DeclaracaoVar{
-    TipoDeVar tipoDeVar;
     TokenId tokenId;
+    TipoDeVar tipoDeVar;
 
     DeclaracaoVar(TipoDeVar tipoDeVar, TokenId tokenId){
         this.tipoDeVar = tipoDeVar;
         this.tokenId = tokenId;
+    }
+
+    @Override
+    public String toString() {
+        if (this.tipoDeVar != null && this.tokenId != null)
+            return "newVar " + this.tipoDeVar + " " + this.tokenId + ";";
+        else
+            return "";
     }
 }
 
@@ -38,74 +61,123 @@ class TipoDeVar{
     TipoDeVar(String tipoDeVar){
         this.tipoDeVar = tipoDeVar;
     }
+
+    @Override
+    public String toString() {
+        return this.tipoDeVar;
+    }
 }
 
 class SequenciaDeComandos{
-    ArrayList<Com> comando;
+    ArrayList<Com> comandos;
 
-    SequenciaDeComandos(ArrayList<Com> comando){
-        this.comando = comando;
+    SequenciaDeComandos(ArrayList<Com> comandos){
+        this.comandos = comandos;
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder stringBuilder = new StringBuilder();
+        for (Com com : this.comandos) {
+            stringBuilder.append(com).append("\n");
+        }
+        return stringBuilder.toString();
     }
 }
 
 class Com{}
 class Atribuicao extends Com{
-    Exp exp;
+    Expressao exp;
     TokenId tokenId;
 
-    Atribuicao(Exp exp, TokenId tokenId){
+    Atribuicao(Expressao exp, TokenId tokenId){
         this.exp = exp;
         this.tokenId = tokenId;
     }
-}
-class ChamadaFunc extends Com{
-    TokenId tokenId;
-    ListaExp listaExp;
 
-    ChamadaFunc(TokenId tokenId, ListaExp listaExp){
+    @Override
+    public String toString() {
+        return this.tokenId + " = " + this.exp + ";";
+    }
+}
+class ChamadaFuncCom extends Com{
+    TokenId tokenId;
+    ListaExpressao listaExp;
+
+    ChamadaFuncCom(TokenId tokenId, ListaExpressao listaExp){
         this.tokenId = tokenId;
         this.listaExp = listaExp;
     }
+
+    @Override
+    public String toString() {
+        return this.tokenId + "(" + this.listaExp + ")" + ";";
+    }
 }
 class Condicional extends Com{
-    Exp exp;
+    Expressao exp;
     SequenciaDeComandos sequenciaDeComandos;
 
-    Condicional(Exp exp, SequenciaDeComandos sequenciaDeComandos){
+    Condicional(Expressao exp, SequenciaDeComandos sequenciaDeComandos){
         this.exp = exp;
         this.sequenciaDeComandos = sequenciaDeComandos;
+    }
+
+    @Override
+    public String toString() {
+        return "if (" + this.exp + ") then {\n" + this.sequenciaDeComandos + "};";
     }
 }
 class LacoWhile extends Com{
-    Exp exp;
+    Expressao exp;
     SequenciaDeComandos sequenciaDeComandos;
 
-    LacoWhile(Exp exp, SequenciaDeComandos sequenciaDeComandos){
+    LacoWhile(Expressao exp, SequenciaDeComandos sequenciaDeComandos){
         this.exp = exp;
         this.sequenciaDeComandos = sequenciaDeComandos;
+    }
+
+    @Override
+    public String toString() {
+        return "while (" + this.exp + ") {\n" + this.sequenciaDeComandos + "};";
     }
 }
 class LacoRepeat extends Com{
-    Exp exp;
+    Expressao exp;
     SequenciaDeComandos sequenciaDeComandos;
 
-    LacoRepeat(Exp exp, SequenciaDeComandos sequenciaDeComandos){
+    LacoRepeat(Expressao exp, SequenciaDeComandos sequenciaDeComandos){
         this.exp = exp;
         this.sequenciaDeComandos = sequenciaDeComandos;
     }
+
+    @Override
+    public String toString() {
+        return "repeat {\n" + this.sequenciaDeComandos + "} until (" + this.exp + ");";
+    }
 }
 class Retorno extends Com{
-    Exp exp;
+    Expressao exp;
 
-    Retorno(Exp exp){
+    Retorno(Expressao exp){
         this.exp = exp;
+    }
+
+    @Override
+    public String toString() {
+        return "return " + this.exp + ";";
     }
 }
 class Saida extends Com{
-    Exp exp;
+    Expressao exp;
 
-    Saida(Exp exp){
+    Saida(Expressao exp){
         this.exp = exp;
+    }
+
+    @Override
+    public String toString() {
+        return "System.output (" + this.exp + ");";
     }
 }
 class Scan extends Com{
@@ -114,24 +186,187 @@ class Scan extends Com{
     Scan(TokenId tokenId){
         this.tokenId = tokenId;
     }
+
+    @Override
+    public String toString() {
+        return this.tokenId + " = " + "System.readint ();";
+    }
 }
 
-class TokenId {
+class Expressao{}
+class RecursaoExpressao extends Expressao{
+    Exp exp1, exp2;
+    Operacao op;
+
+    RecursaoExpressao(Exp exp1, Exp exp2, Operacao op){
+        this.exp1 = exp1;
+        this.exp2 = exp2;
+        this.op = op;
+    }
+
+    @Override
+    public String toString() {
+        return "(" + this.exp1 + " " + this.op + " " + this.exp2 + ")";
+    }
+}
+class Fator extends Expressao{}
+class TokenId extends Fator {
     String var;
 
     TokenId(String var){
         this.var = var;
     }
-}
 
-class TokenNum {
+    @Override
+    public String toString() {
+        return this.var;
+    }
+}
+class TokenNum extends Fator {
     Integer num;
 
     TokenNum(Integer num){
         this.num = num;
     }
+
+    @Override
+    public String toString() {
+        return this.num.toString();
+    }
+}
+class ChamadaFuncFator extends Fator{
+    TokenId tokenId;
+    ListaExpressao listaExp;
+
+    ChamadaFuncCom(TokenId tokenId, ListaExpressao listaExp){
+        this.tokenId = tokenId;
+        this.listaExp = listaExp;
+    }
+
+    @Override
+    public String toString() {
+        return this.tokenId + "(" + this.listaExp + ")" + ";";
+    }
+}
+class Booleano extends Fator{
+    String booleano;
+
+    Booleano(String booleano){
+        this.booleano = booleano;
+    }
+
+    @Override
+    public String toString() {
+        return this.booleano;
+    }
 }
 
+class Operacao{
+     String op;
+
+     Booleano(String op){
+         this.op = op;
+     }
+
+     @Override
+     public String toString() {
+         return this.op;
+     }
+}
+
+class ListaExpressao{
+    ArrayList<Expressao> expressoes;
+
+    ListaExpressao2(ArrayList<Expressao> expressoes){
+        this.expressoes = expressoes;
+    }
+
+    @Override
+     public String toString() {
+        if (this.expressoes.size() == 1) return expressoes.get(0).toString();
+        StringBuilder stringBuilder = new StringBuilder();
+        for (Expressao exp : this.expressoes) {
+            stringBuilder.append(exp).append(", ");
+        }
+        return stringBuilder.toString();
+    }
+}
+
+class Funcao{
+    TokenId tokenId;
+    TipoDeVar tipoDeVar;
+    ListaArgumentos listaArgumentos;
+    ArrayList<DeclaracaoVar> declaracaoVar;
+    SequenciaDeComandos sequenciaDeComandos;
+
+    Funcao(TokenId tokenId, TipoDeVar tipoDeVar, ListaArgumentos listaArgumentos,
+    ArrayList<DeclaracaoVar> declaracaoVar, SequenciaDeComandos sequenciaDeComandos){
+            this.tokenId = tokenId;
+            this.tipoDeVar = tipoDeVar;
+            this.listaArgumentos = listaArgumentos;
+            this.declaracaoVar = declaracaoVar;
+            this.sequenciaDeComandos = sequenciaDeComandos;
+    }
+
+    @Override
+     public String toString() {
+        StringBuilder stringBuilder = new StringBuilder("func " + this.tipoDeVar + " " + this.tokenId + "(" + this.listaArgumentos + ")\n{");
+        for (DeclaracaoVar decVar : this.declaracaoVar) {
+            stringBuilder.append(decVar).append("\n");
+        }
+        stringBuilder.append(sequenciaDeComandos).append("\n}");
+        return stringBuilder.toString();
+    }
+}
+class ListaFuncao extends Funcao{
+    ArrayList<Funcao> funcoes;
+
+    ListaFuncao(ArrayList<Funcao> funcoes){
+        this.funcoes = funcoes;
+    }
+
+    @Override
+     public String toString() {
+        if (this.funcoes.size() == 1) return super.toString();
+        StringBuilder stringBuilder = new StringBuilder();
+        for (Funcao func : this.funcoes) {
+            stringBuilder.append(func.toString()).append("\n");
+        }
+        return stringBuilder.toString();
+    }
+}
+
+class Argumento{
+    TipoDeVar tipoDeVar;
+    TokenId tokenId;
+
+    Argumento(TipoDeVar tipoDeVar, TokenId tokenId){
+        this.tipoDeVar = tipoDeVar;
+        this.tokenId = tokenId;
+    }
+
+    @Override
+     public String toString() {
+        return this.tipoDeVar + " " + this.tokenId;
+    }
+}
+class ListaArgumentos extends Argumento{
+    ArrayList<Argumento> argumentos;
+
+    LECaso2(ArrayList<ListaArgumentos> argumentos){
+        this.argumentos = argumentos;
+    }
+
+    @Override
+     public String toString() {
+        if (this.argumentos.size() == 1) return super.toString();
+        StringBuilder stringBuilder = new StringBuilder();
+        for (Argumento arg : this.argumentos) {
+            stringBuilder.append(arg).append(", ");
+        }
+        return stringBuilder.toString();
+    }
+}
 
 public class Karloff {
     public static void main(String[] args) throws IOException {
@@ -207,36 +442,37 @@ KarloffTree Karloff () :
 
 // MAIN → "void" "main" "(" ")" "{" VARDECL SEQCOMANDOS "}"
 Principal Main () :
-{DeclaracaoVar varDec = null; SequenciaDeComandos seqCom = null;}
+{ArrayList<DeclaracaoVar> varDec = null; SequenciaDeComandos seqCom = null;}
 {
     <VOID> <MAIN> <APARENTESES> <FPARENTESES> <ACHAVES> varDec=Vardecl() seqCom=SeqComandos() <FCHAVES>
     {return new Principal(varDec, seqCom);}
 }
 
 // VARDECL → VARDECL "newVar" TIPO TOKEN_id ";" | vazio
-DeclaracaoVar Vardecl () :
-{Token t = null; TipoDeVar tipoDeVar = null;}
+ArrayList<DeclaracaoVar> Vardecl () :
+{Token t = null; TipoDeVar tipoDeVar = null; ArrayList<DeclaracaoVar> ldv = null;}
 {
-    (<NEWVAR> tipoDeVar=Tipo() t=<ID> <PONTOVIRGULA>)*
-    {return new DeclaracaoVar(tipoDeVar, new TokenId(t.image));}
+    (<NEWVAR> tipoDeVar=Tipo() t=<ID> <PONTOVIRGULA> {ldv.add(new DeclaracaoVar(tipoDeVar, new TokenId(t.image)));})*
+    {return ldv;}
 }
 
 // TIPO → "integer" | "bool"
 TipoDeVar Tipo () :
-{TipoDeVar result = null;}
+{TipoDeVar tipoDeVar = null;}
 {
     (
-        <INTEIRO> {result = new TipoDeVar("integer");}
-        | <BOOLEANO> {result = new TipoDeVar("bool");}
+        <INTEIRO> {tipoDeVar = new TipoDeVar("integer");}
+        | <BOOLEANO> {tipoDeVar = new TipoDeVar("bool");}
     )
-    {return result;}
+    {return tipoDeVar;}
 }
 
 // SEQCOMANDOS → SEQCOMANDOS COMANDO | vazio
 SequenciaDeComandos SeqComandos () :
 {Com c = null; ArrayList<Com> comandos = new ArrayList<>();}
 {
-    (c=Comando())* {comandos.add(c); return comandos;}
+    (c=Comando() {comandos.add(c);})*
+    {return new SequenciaDeComandos(comandos);}
 }
 
 
@@ -251,7 +487,7 @@ Com Comando () :
 Expressao e = null; Com result = null; Com comL = null;}
 {
     (
-        t=<ID> comL=Comando_()
+        t=<ID> comL=Comando_(new TokenId(t.image)) {result = comL;}
         | <IF> <APARENTESES> e=Exp() <FPARENTESES> <THEN> <ACHAVES> seqCom=SeqComandos() <FCHAVES> <PONTOVIRGULA> {result = new Condicional(e, seqCom);}
         | <WHILE> <APARENTESES> e=Exp() <FPARENTESES> <ACHAVES> seqCom=SeqComandos() <FCHAVES> <PONTOVIRGULA> {result = new LacoWhile(e, seqCom);}
         | <REPEAT> <ACHAVES> seqCom=SeqComandos() <FCHAVES> <UNTIL> <APARENTESES> e=Exp() <FPARENTESES> <PONTOVIRGULA> {result = new LacoRepeat(e, seqCom);}
@@ -263,69 +499,100 @@ Expressao e = null; Com result = null; Com comL = null;}
 }
 
 // COMANDO’ → "=" COMANDO’’ | "(" LISTAEXP? ")"  ";"
-void Comando_ () :
-{}
+Com Comando_ (TokenId t) :
+{Com result = null; Com comLL = null; ListaExpressao l = null;}
 {
-(<ATRIB> Comando__())
-| (<APARENTESES> (ListaExp())? <FPARENTESES> <PONTOVIRGULA>)
+    (
+        <ATRIB> comLL=Comando__() {result = comLL;}
+        | <APARENTESES> (l=ListaExp())? <FPARENTESES> <PONTOVIRGULA> {result = ChamadaFuncCom(t, l);}
+    )
+    {return result;}
 }
 
 // COMANDO’’ → EXP ";" | "System.readint" "(" ")" ";"
-void Comando__ () :
-{}
+Com Comando__ (TokenId t) :
+{Com result = null; Expressao e = null;}
 {
-(Exp() <PONTOVIRGULA>)
-| (<SREADINT> <APARENTESES> <FPARENTESES> <PONTOVIRGULA>)
+    (
+        e=Exp() <PONTOVIRGULA> {result = new Atribuicao(e, t);}
+        | <SREADINT> <APARENTESES> <FPARENTESES> <PONTOVIRGULA> {result = new Saida(e);}
+    )
+    {return result;}
 }
 
 //EXP →  "(" EXP OP EXP ")" | FATOR
-void Exp () :
-{}
+Expressao Exp () :
+{Expressao e1 = null; Expressao e2 = null; Operacao op = null; Expressao result = null; Fator f = null;}
 {
-(<APARENTESES> Exp() Op() Exp() <FPARENTESES>)
-| Fator()
+    (
+        <APARENTESES> e1=Exp() op=Op() e2=Exp() <FPARENTESES> {result = new RecursaoExpressao(e1, e2, op);}
+        | f=Fator() {result = f;}
+    )
+    {return result;}
 }
 
 //FATOR →  TOKEN_id FATOR’| TOKEN_numliteral | "true" | "false"
-void Fator () :
-{}
+Fator Fator () :
+{Fator result = null; Fator fatorL = null; Token t = null; TokenId tokenId = null; TokenNum TokenNum = null;}
 {
-(<ID> Fator_()) | <NUM> | <TRUE> | <FALSE>
+    (
+        t=<ID> fatorL=Fator_(new TokenId(t.image)) {result = fatorL == null ? new TokenId(t.image) : fatorL;}
+        | t=<NUM> {result = new TokenNum(Integer.parseInt(t.image));}
+        | <TRUE> {result = new Booleano("true");}
+        | <FALSE> {result = new Booleano("false");}
+    )
+    {return result;}
 }
 
 //FATOR’ →  "(" LISTAEXP? ")" | vazio
-void Fator_ () :
-{}
+Fator Fator_ (TokenId tokenId) :
+{ListaExpressao le = null;}
 {
-(<APARENTESES> (ListaExp())? <FPARENTESES>)?
+    (<APARENTESES> (le=ListaExp())? <FPARENTESES>)? {return new ChamadaFuncFator(tokenId, le);}
 }
 
 //OP →  "+" | "-" | "*" | "/" | "&" | "|" | "<" | ">" | "=="
-void Op () :
-{}
+Operacao Op () :
+{Operacao result = null;}
 {
-<SOMA> | <SUB> | <MULT> | <DIV> | <AND> | <OR> | <MENOR> | <MAIOR> | <IGUAL>
+    (
+        <SOMA> {result = new Operacao("+");}
+        | <SUB> {result = new Operacao("-");}
+        | <MULT> {result = new Operacao("*");}
+        | <DIV> {result = new Operacao("/");}
+        | <AND> {result = new Operacao("&");}
+        | <OR> {result = new Operacao("|");}
+        | <MENOR> {result = new Operacao("<");}
+        | <MAIOR> {result = new Operacao(">");}
+        | <IGUAL> {result = new Operacao("==");}
+    )
+    {return result;}
 }
 
 //LISTAEXP → EXP | LISTAEXP "," EXP
-void ListaExp () :
-{}
+ListaExpressao ListaExp () :
+{Exp e = null; ArrayList<Expressao> lista = new ArrayList<>();}
 {
-Exp() (<VIRGULA> Exp())*
+    e=Exp() {lista.add(e);} (<VIRGULA> e=Exp() {lista.add(e);})*
+    {return new ListaArgumentos(lista);}
 }
 
 //FUNC → FUNC "func" TIPO TOKEN_id "(" LISTAARG? ")" "{" VARDECL SEQCOMANDOS "}"
 //        | "func" TIPO TOKEN_id "(" LISTAARG? ")" "{" VARDECL SEQCOMANDOS "}"
-void Func () :
-{}
+Func Func () :
+{TipoDeVar tipoDeVar = null; ListaArgumentos la = null; ArrayList<Funcao> funcoes = new ArrayList<>();
+DeclaracaoVar declaracaoVar = null; SequenciaDeComandos sequenciaDeComandos = null;
+Token t = null; TokenId tokenId = null;}
 {
-(<FUNC> Tipo() <ID> <APARENTESES> (ListaArg())? <FPARENTESES> <ACHAVES> Vardecl() SeqComandos() <FCHAVES>)+
+    (<FUNC> tipoDeVar=Tipo() t=<ID> <APARENTESES> (la=ListaArg())? <FPARENTESES> <ACHAVES> declaracaoVar=Vardecl() sequenciaDeComandos=SeqComandos() <FCHAVES> {funcoes.add(new Funcao(new TokenId(t.image), tipoDeVar, la, declaracaoVar, sequenciaDeComandos));})+
+    {return new ListaFuncao(funcoes);}
 }
 
 
 //LISTAARG → TIPO TOKEN_id | LISTAARG "," TIPO TOKEN_id
-void ListaArg () :
-{Token t; TipoDeVar tipoDeVar;}
+ListaArgumentos ListaArg () :
+{Token t = null; TipoDeVar tipoDeVar = null; TokenId tokenId = null;
+ListaArgumentos la = null; Argumento arg = null; ArrayList<Argumento> args = new ArrayList<>();}
 {
-Tipo() <ID> (<VIRGULA> Tipo() <ID>)*
+    tipoDeVar=Tipo() t=<ID> {args.add(new Argumento(tipoDeVar, new TokenId(t.image)));} (<VIRGULA> tipoDeVar=Tipo() t=<ID> {args.add(new Argumento(tipoDeVar, new TokenId(t.image)));})*
 }
