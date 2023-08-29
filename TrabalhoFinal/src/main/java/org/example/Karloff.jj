@@ -17,8 +17,8 @@ class KarloffTree{
 
     @Override
     public String toString() {
-        if (lf == null) return this.main.toString();
-        else return this.main.toString() + this.lf.toString();
+        return "import java.io.*;\nimport java.util.Scanner;\npublic class Karloff {\n\n"
+        + this.main + (this.lf == null ? "" : "\n" + this.lf) + "\n}\n";
     }
 }
 
@@ -34,9 +34,9 @@ class Principal{
     @Override
     public String toString() {
         StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append("void main() {\n");
+        stringBuilder.append("public static void main(String[] args) {\n");
         for (DeclaracaoVar decVar : this.declaracaoVar) {
-            stringBuilder.append("\t").append(decVar).append("\n");
+            stringBuilder.append(decVar).append("\n");
         }
         return stringBuilder.append(this.sequenciaDeComandos).append("}\n").toString();
     }
@@ -54,22 +54,29 @@ class DeclaracaoVar{
     @Override
     public String toString() {
         if (this.tipoDeVar != null && this.tokenId != null)
-            return "newVar " + this.tipoDeVar + " " + this.tokenId + ";";
+            return this.tipoDeVar + " " + this.tokenId + ";";
         else
             return "";
     }
 }
 
 class TipoDeVar{
-    String tipoDeVar;
+    String tipo;
 
-    TipoDeVar(String tipoDeVar){
-        this.tipoDeVar = tipoDeVar;
+    TipoDeVar(String tipo){
+        this.tipo = tipo;
     }
 
     @Override
     public String toString() {
-        return this.tipoDeVar;
+        switch (this.tipo){
+            case "integer":
+                return "int";
+            case "bool":
+                return "boolean";
+            default:
+                return "";
+        }
     }
 }
 
@@ -84,7 +91,7 @@ class SequenciaDeComandos{
     public String toString() {
         StringBuilder stringBuilder = new StringBuilder();
         for (Com com : this.comandos) {
-            stringBuilder.append("\t").append(com).append("\n");
+            stringBuilder.append(com).append("\n");
         }
         return stringBuilder.toString();
     }
@@ -131,7 +138,7 @@ class Condicional extends Com{
 
     @Override
     public String toString() {
-        return "if (" + this.exp + ") then {\n\t" + this.sequenciaDeComandos + "\t};";
+        return "if (" + this.exp + ") {\n" + this.sequenciaDeComandos + "}";
     }
 }
 class LacoWhile extends Com{
@@ -145,7 +152,7 @@ class LacoWhile extends Com{
 
     @Override
     public String toString() {
-        return "while (" + this.exp + ") {\n" + this.sequenciaDeComandos + "\t};";
+        return "while (" + this.exp + ") {\n" + this.sequenciaDeComandos + "}";
     }
 }
 class LacoRepeat extends Com{
@@ -159,7 +166,7 @@ class LacoRepeat extends Com{
 
     @Override
     public String toString() {
-        return "repeat {\n\t" + this.sequenciaDeComandos + "\t} until (" + this.exp + ");";
+        return "do {\n" + this.sequenciaDeComandos + "} while (" + this.exp + ");";
     }
 }
 class Retorno extends Com{
@@ -183,11 +190,12 @@ class Saida extends Com{
 
     @Override
     public String toString() {
-        return "System.output (" + this.exp + ");";
+        return "System.out.println(" + this.exp + ");";
     }
 }
 class Scan extends Com{
     TokenId tokenId;
+    private static int counter = 0;
 
     Scan(TokenId tokenId){
         this.tokenId = tokenId;
@@ -195,7 +203,11 @@ class Scan extends Com{
 
     @Override
     public String toString() {
-        return this.tokenId + " = " + "System.readint ();";
+        StringBuilder stringBuilder = new StringBuilder();
+        if (counter == 0) stringBuilder.append("Scanner scan = new Scanner(System.in);\n");
+        stringBuilder.append(this.tokenId).append(" = scan.nextInt();\nscan.nextLine();\n");
+        counter++;
+        return stringBuilder.toString();
     }
 }
 
@@ -316,11 +328,11 @@ class Funcao{
 
     @Override
      public String toString() {
-        StringBuilder stringBuilder = new StringBuilder("func " + this.tipoDeVar + " " + this.tokenId + "(" + this.listaArgumentos + ") {\n");
+        StringBuilder stringBuilder = new StringBuilder("public static " + this.tipoDeVar + " " + this.tokenId + "(" + this.listaArgumentos + ") {\n");
         for (DeclaracaoVar decVar : this.declaracaoVar) {
             stringBuilder.append(decVar).append("\n");
         }
-        stringBuilder.append(sequenciaDeComandos).append("}");
+        stringBuilder.append(sequenciaDeComandos).append("}\n");
         return stringBuilder.toString();
     }
 }
