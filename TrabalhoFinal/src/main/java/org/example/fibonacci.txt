@@ -1,14 +1,17 @@
 void main () {
     newVar integer numTermos;
-    newVar integer resultado;
+    newVar integer contador;
+    contador = 0;
     numTermos = System.readint();
-    resultado = fibonnaci(numTermos);
+    while ((contador < (numTermos + 1))) {
+        System.output(fibonnaci(contador));
+        contador = (contador + 1);
+    };
 }
 
 func integer fibonnaci (integer seq) {
     if ( (seq < 2) ) then {
-        return seq;
+        return 1;
     };
-    System.output(seq);
     return ( fibonnaci((seq - 1)) + fibonnaci((seq - 2)) );
 }
