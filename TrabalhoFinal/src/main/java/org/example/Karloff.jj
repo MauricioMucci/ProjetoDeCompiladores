@@ -1,6 +1,8 @@
 PARSER_BEGIN(Karloff)
 import java.io.*;
 import java.util.ArrayList;
+import java.io.FileWriter;
+import java.io.PrintWriter;
 
 class KarloffTree{
     Principal main;
@@ -17,7 +19,7 @@ class KarloffTree{
 
     @Override
     public String toString() {
-        return "import java.io.*;\nimport java.util.Scanner;\npublic class Karloff {\n\n"
+        return "package org.test;\nimport java.util.Scanner;\npublic class KarloffTeste {\n\n"
         + this.main + (this.lf == null ? "" : "\n" + this.lf) + "\n}\n";
     }
 }
@@ -390,6 +392,10 @@ public class Karloff {
     public static void main(String[] args) throws ParseException, IOException {
         Karloff parser = new Karloff(new FileInputStream(args[0]));
         KarloffTree tree = parser.Karloff();
+        FileWriter file = new FileWriter("../test/KarloffTeste.java");
+        PrintWriter print = new PrintWriter(file);
+        print.printf(tree.toString());
+        file.close();
         System.out.println(tree);
     }
 }
